@@ -58,6 +58,23 @@ def promises_proc():
     with open('files/json/es_365_promises_up.json', 'wb+') as fp:
         fp.write(json.dumps(promises_up, ensure_ascii=False, indent = 2, separators=(',', ': ')).encode('utf-8'))
 
+def counsels_proc():
+    counsels = []
+    counsels_up = []
+    with open('files/json/es_365_counsels.json', 'rb') as fp:
+        counsels = json.load(fp)
+    random.seed(7)
+    random_order = random.sample(range(1, len(counsels)+1), len(counsels))
+    for i, counsel in enumerate(counsels, start=1):
+        counsels_up.append({
+            "original_order" : i,
+            "counsel" : counsel["body"],
+            "reference" : counsel["reference"],
+            "random_order" : random_order[i-1]
+        })
+    with open('files/json/es_365_counsels_up.json', 'wb+') as fp:
+        fp.write(json.dumps(counsels_up, ensure_ascii=False, indent = 2, separators=(',', ': ')).encode('utf-8'))
+
 def bible_verse_reference_parse(ref):
     s = ref.split(':')
     book = ' '.join(s[0].split(' ')[:-1])
@@ -77,3 +94,5 @@ def test_promises():
                                     cron_day=i+1)
         if msg[0] == '😞':
             print(i, msg)
+
+counsels_proc()
