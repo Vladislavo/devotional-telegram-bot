@@ -94,5 +94,3 @@ def test_promises():
                                     cron_day=i+1)
         if msg[0] == '😞':
             print(i, msg)
-
-counsels_proc()

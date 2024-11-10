@@ -6,6 +6,7 @@ from db.book import Book
 from db.study import Study
 from db.bible import Bible
 from db.promise import Promise
+from db.counsel import Counsel
 
 from utils.consts import MATERIAL_TYPES, BIBLE_VERSES_COUNT, BIBLE_BOOKS_ACRONYMS_LUT
 from utils.utils import extract_material_name, parse_bible_reference, match_bible_book
@@ -19,6 +20,8 @@ def compose(subscription_title, month, day, cron_day):
         message, file_ids = compose_study_message(subscription_title, cron_day+1)
     elif MATERIAL_TYPES[subscription_title] == 'Promise':
         message, file_ids = compose_promise_message(subscription_title, cron_day+1)
+    elif MATERIAL_TYPES[subscription_title] == 'Counsel':
+        message, file_ids = compose_counsel_message(subscription_title, cron_day+1)
     else:
         raise Exception(f'Unknown material option: title={subscription_title}, month={month}, day={day}, cron_day={cron_day+1}')
 
@@ -188,6 +191,20 @@ def compose_promise_message(subscription_title: str, day: int) -> str:
         ret = f'🌼 <b>La promesa del día {day}</b> 📆\n\n' \
               f'📖 {bible_text}\n' \
               f'{promise.verse_bible_reference} ❤️'
+    else:
+        ret = '😞Disculpe, hubo un error al construir el mensaje. Apreciamos que nos lo comunique para que lo resolvemos rápido.'
+
+    return ret, {}
+
+def compose_counsel_message(subscription_title: str, day: int) -> str:
+    session = Session()
+    counsel = session.query(Counsel).filter(Counsel.random_order == day).first()
+    session.close()
+
+    if counsel != None:
+        ret = f'🌼 <b>El consejo del día {day}</b> 📆\n\n' \
+              f'📖 {counsel.counsel}\n\n' \
+              f'{counsel.reference} ❤️'
     else:
         ret = '😞Disculpe, hubo un error al construir el mensaje. Apreciamos que nos lo comunique para que lo resolvemos rápido.'
 
